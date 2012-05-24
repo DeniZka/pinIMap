@@ -7,40 +7,6 @@
     <property name="can_focus">False</property>
     <property name="stock">gtk-sort-ascending</property>
   </object>
-  <object class="GtkImage" id="ImBMerge1">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="stock">gtk-sort-ascending</property>
-  </object>
-  <object class="GtkImage" id="ImBMerge2">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="stock">gtk-sort-ascending</property>
-  </object>
-  <object class="GtkImage" id="ImBMerge3">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="stock">gtk-sort-ascending</property>
-  </object>
-  <object class="GtkImage" id="ImBMerge4">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="stock">gtk-sort-ascending</property>
-  </object>
-  <object class="GtkListStore" id="dataStore">
-    <columns>
-      <!-- column-name prev -->
-      <column type="GdkPixbuf"/>
-      <!-- column-name files -->
-      <column type="gchararray"/>
-      <!-- column-name lats -->
-      <column type="gdouble"/>
-      <!-- column-name lngs -->
-      <column type="gdouble"/>
-      <!-- column-name path -->
-      <column type="gchararray"/>
-    </columns>
-  </object>
   <object class="GtkWindow" id="WMain">
     <property name="width_request">640</property>
     <property name="height_request">480</property>
@@ -235,30 +201,60 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkHButtonBox" id="hbuttonbox1">
+                  <object class="GtkHBox" id="hbox2">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="layout_style">start</property>
                     <child>
-                      <object class="GtkButton" id="BMerge">
-                        <property name="label" translatable="yes">Merge to new</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">True</property>
-                        <property name="use_action_appearance">False</property>
-                        <property name="image">ImBMerge4</property>
+                      <object class="GtkHButtonBox" id="hbuttonbox2">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="spacing">37</property>
+                        <property name="layout_style">start</property>
+                        <child>
+                          <object class="GtkButton" id="button1">
+                            <property name="label">gtk-find</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">True</property>
+                            <property name="use_action_appearance">False</property>
+                            <property name="use_stock">True</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">False</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="BMerge">
+                            <property name="label" translatable="yes">Merge to new</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">True</property>
+                            <property name="use_action_appearance">False</property>
+                            <property name="image">ImBMerge</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">False</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
                       </object>
                       <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">False</property>
+                        <property name="expand">True</property>
+                        <property name="fill">True</property>
                         <property name="position">0</property>
                       </packing>
                     </child>
                   </object>
                   <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">False</property>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
                     <property name="position">1</property>
                   </packing>
+                </child>
+                <child>
+                  <placeholder/>
                 </child>
               </object>
               <packing>
@@ -291,5 +287,19 @@
         </child>
       </object>
     </child>
+  </object>
+  <object class="GtkListStore" id="dataStore">
+    <columns>
+      <!-- column-name prev -->
+      <column type="GdkPixbuf"/>
+      <!-- column-name files -->
+      <column type="gchararray"/>
+      <!-- column-name lats -->
+      <column type="gdouble"/>
+      <!-- column-name lngs -->
+      <column type="gdouble"/>
+      <!-- column-name path -->
+      <column type="gchararray"/>
+    </columns>
   </object>
 </interface>

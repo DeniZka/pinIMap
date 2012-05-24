@@ -155,7 +155,7 @@ function initialize() {
     }
   p {
     font-family: Verdana, Arial, Helvetica, sans-serif; 
-    font-size: 8pt;
+    font-size: 8pt; /*  Размер шрифта в пунктах */ 
   }
 
   </style>

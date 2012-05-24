@@ -3,7 +3,7 @@
 #
  
 # name of your project/program
-PROGRAM = pinimap
+PROGRAM = main_debug
  
  
 # for most cases the following two are the only you'll need to change
