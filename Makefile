@@ -4,8 +4,7 @@
  
 # name of your project/program
 PROGRAM = pinimap
- 
- 
+
 # for most cases the following two are the only you'll need to change
 # add your source files here
 SRC = vui.vala
@@ -21,11 +20,11 @@ VALACOPTS = --thread
 #-g --save-temps
  
 # set this as root makefile for Valencia
-BUILD_ROOT = 1
+BUILD_ROOT = 0
  
 # the 'all' target build a debug build
 all:
-	@$(VALAC) $(VALACOPTS) $(SRC) -o $(PROGRAM) $(PKGS)
+	@$(VALAC) $(VALACOPTS) $(SRC) -C -o $(PROGRAM) $(PKGS)
  
 # the 'release' target builds a release build
 # you might want to disabled asserts also

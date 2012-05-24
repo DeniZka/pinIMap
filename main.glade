@@ -19,7 +19,7 @@
         <property name="can_focus">True</property>
         <child>
           <object class="GtkVBox" id="vbox1">
-            <property name="width_request">180</property>
+            <property name="width_request">200</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>

@@ -72,8 +72,6 @@ public class Vui : GLib.Object {
                 foreach (TreePath tp in sl) {
                     tm.get_iter(out ti, tp);
                     string name;
-                    double lat;
-                    double lng;
                     tm.get(ti, COL_FIL, out name);
                     if (name == tokens[i]) {
                         dataStore.set(ti, COL_LAT, double.parse(tokens[1]),
