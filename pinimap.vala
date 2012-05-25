@@ -55,7 +55,7 @@ public class pinimap : GLib.Object {
 
         string doc;
         try {
-            FileUtils.get_contents("init.html", out doc);
+            FileUtils.get_contents("index.html", out doc);
         } catch (Error e) {
             stderr.printf ("Error: %s\n", e.message);
         }

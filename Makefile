@@ -7,7 +7,7 @@ PROGRAM = pinimap
 
 # for most cases the following two are the only you'll need to change
 # add your source files here
-SRC = vui.vala
+SRC = pinimap.vala
  
 # add your used packges here
 PKGS = --pkg gtk+-2.0 --pkg webkit-1.0 --pkg gexiv2 --pkg gmodule-2.0
