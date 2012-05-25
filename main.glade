@@ -35,7 +35,7 @@
                     <property name="label" translatable="yes">Open</property>
                     <property name="use_underline">True</property>
                     <property name="stock_id">gtk-open</property>
-                    <signal name="clicked" handler="vui_on_bopen_click" swapped="no"/>
+                    <signal name="clicked" handler="pinimap_on_bopen_click" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">True</property>
@@ -61,7 +61,7 @@
                     <property name="label" translatable="yes">Save</property>
                     <property name="use_underline">True</property>
                     <property name="stock_id">gtk-save</property>
-                    <signal name="clicked" handler="vui_on_BSave_clicked" swapped="no"/>
+                    <signal name="clicked" handler="pinimap_on_BSave_clicked" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -87,7 +87,7 @@
                     <property name="label" translatable="yes">Clear</property>
                     <property name="use_underline">True</property>
                     <property name="stock_id">gtk-clear</property>
-                    <signal name="clicked" handler="vui_on_BClear_clicked" swapped="no"/>
+                    <signal name="clicked" handler="pinimap_on_BClear_clicked" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -117,7 +117,6 @@
                     <property name="search_column">1</property>
                     <property name="rubber_banding">True</property>
                     <property name="enable_grid_lines">vertical</property>
-                    <signal name="cursor-changed" handler="vui_on_TVFiles_cursor_changed" swapped="no"/>
                     <child>
                       <object class="GtkTreeViewColumn" id="TVCFile">
                         <property name="resizable">True</property>
@@ -185,14 +184,18 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
-                  <object class="GtkEntry" id="EFind">
+                  <object class="GtkEntry" id="ESearch">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <property name="has_focus">True</property>
                     <property name="invisible_char">●</property>
+                    <property name="secondary_icon_stock">gtk-clear</property>
                     <property name="primary_icon_activatable">False</property>
-                    <property name="secondary_icon_activatable">False</property>
+                    <property name="secondary_icon_activatable">True</property>
                     <property name="primary_icon_sensitive">True</property>
                     <property name="secondary_icon_sensitive">True</property>
+                    <signal name="activate" handler="pinimap_on_ESearch_activate" swapped="no"/>
+                    <signal name="icon-press" handler="pinimap_on_ESearch_icon_press" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">True</property>
@@ -211,13 +214,14 @@
                         <property name="spacing">37</property>
                         <property name="layout_style">start</property>
                         <child>
-                          <object class="GtkButton" id="button1">
+                          <object class="GtkButton" id="BSearch">
                             <property name="label">gtk-find</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
                             <property name="use_action_appearance">False</property>
                             <property name="use_stock">True</property>
+                            <signal name="clicked" handler="pinimap_on_BSearch_clicked" swapped="no"/>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -226,12 +230,13 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkButton" id="BMerge">
-                            <property name="label" translatable="yes">Merge to new</property>
+                          <object class="GtkButton" id="BCenter">
+                            <property name="label">gtk-justify-center</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
                             <property name="use_action_appearance">False</property>
-                            <property name="image">ImBMerge</property>
+                            <property name="use_stock">True</property>
+                            <signal name="clicked" handler="pinimap_on_BCenter_clicked" swapped="no"/>
                           </object>
                           <packing>
                             <property name="expand">False</property>

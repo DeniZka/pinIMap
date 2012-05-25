@@ -24,7 +24,7 @@ BUILD_ROOT = 0
  
 # the 'all' target build a debug build
 all:
-	@$(VALAC) $(VALACOPTS) $(SRC) -C -o $(PROGRAM) $(PKGS)
+	@$(VALAC) $(VALACOPTS) $(SRC) -o $(PROGRAM) $(PKGS)
  
 # the 'release' target builds a release build
 # you might want to disabled asserts also

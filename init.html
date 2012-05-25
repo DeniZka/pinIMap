@@ -12,13 +12,14 @@
 <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
 <script type="text/javascript">
-var geocoder = new google.maps.Geocoder();
+var geocoder;
 var map;
 // Pointer Marker
 var marker;
 // Markers for selected photos
 var markersArray = [];
 var file_list;
+var request;
 
 function geocodePosition(pos) {
     geocoder.geocode({
@@ -32,22 +33,58 @@ function geocodePosition(pos) {
     });
 }
 
-function updateMarkerStatus(str) {
-}
-
-function updateMarkerPosition(latLng) {
-
+function geocodeBounds(bounds) {
+    geocoder.geocode({
+        bounds: bounds
+    }, function(responses) {
+        if (responses && responses.length > 0) {
+            updateMarkerAddress(responses[0].formatted_address);
+        } else {
+            updateMarkerAddress('Cannot determine address at this location.');
+        }
+    });
 }
 
 function updateMarkerAddress(str) {
     document.getElementById('address').innerHTML = str;
 }
 
+function pan_to_address() {
+    geocoder.geocode({
+        address: request
+    }, function(responses) {
+        if (responses && responses.length > 0) {
+            var bounds = new google.maps.LatLngBounds();
+            for (var i in responses) {
+                bounds.union(responses[i].geometry.viewport);
+            }
+            map.fitBounds(bounds);            
+        } else {
+            console.log("no_resutls");
+        }
+    });
+}
+
+function center_markers() {
+    //Clear prevous markers
+    var title;
+    if (markersArray) {
+        var center = map.getCenter();
+        for (i in markersArray) {
+            if (i == 0) { continue; }
+            title = markersArray[0].getTitle();
+            markersArray[0].setTitle(title + ' ' + markersArray[i].getTitle());
+            markersArray[i].setMap(null);
+        }
+        markersArray[0].setPosition(center);
+        console.log('coords ' + center.lat() + ' ' + center.lng() + ' ' + markersArray[0].getTitle());
+    }     
+}
+
 function new_coords(lat, lng) {
     console.log(' FILE ' + lat + ' ' + lng);
     clear_markers();
     var center = new google.maps.LatLng(lat, lng);
-    updateMarkerPosition(center);
     geocodePosition(center);
     map.setCenter(center)
     marker.setPosition(center);
@@ -78,7 +115,7 @@ function add_marker(lat, lng) {
         }
     } 
 
-    console.log("Lat: " + lat + ', ' + lng);
+//    console.log("Lat: " + lat + ', ' + lng);
     var ll = new google.maps.LatLng(lat, lng);
     var mk = new google.maps.Marker({
         position: ll,
@@ -90,7 +127,6 @@ function add_marker(lat, lng) {
     markersArray.push(mk);
 
     // Update current position info.
-    updateMarkerPosition(ll);
     geocodePosition(ll);
   
     // Add dragging event listeners.
@@ -98,20 +134,37 @@ function add_marker(lat, lng) {
         updateMarkerAddress('Dragging...');
     });
   
-    google.maps.event.addListener(mk, 'drag', function() {
-        updateMarkerStatus('Dragging...');
-        updateMarkerPosition(mk.getPosition());
-    });
-  
     google.maps.event.addListener(mk, 'dragend', function() {
-        updateMarkerStatus('Drag ended');
         var latLng = mk.getPosition();
         geocodePosition(latLng);
         console.log('coords ' + latLng.lat() + ' ' + latLng.lng() + ' ' + mk.getTitle());
     });
+
+    //position on selected bounds
+    if (markersArray) {
+        if (markersArray.length == 1) {
+            //not so zoom if only one marker
+            var mll = markersArray[0].getPosition();
+            map.panTo(mll);
+            map.setZoom(18);
+            geocodePosition(mll);
+        } else {        
+            var bounds = new google.maps.LatLngBounds();
+            for (var i in markersArray) {
+                var mll = markersArray[i].getPosition();
+                var tb = new google.maps.LatLngBounds(mll, mll);
+                bounds.union(tb);
+            }
+            map.fitBounds(bounds);
+            geocodeBounds(bounds);
+        }
+    }
 };
 
 function mapLoaded() {
+    geocoder = new google.maps.Geocoder();
+    google.maps.event.addDomListener(window, 'load', mapLoaded);
+
     var latLng = new google.maps.LatLng(37, 20);
     map = new google.maps.Map(document.getElementById('mapCanvas'), {
         zoom: 2,
@@ -131,7 +184,6 @@ function initialize() {
 }
 
 
-google.maps.event.addDomListener(window, 'load', initialize);
 </script>
 </head>
 <body onload='initialize()'>
@@ -165,16 +217,15 @@ google.maps.event.addDomListener(window, 'load', initialize);
     p {
         font-family: Verdana, Arial, Helvetica, sans-serif; 
         font-size: 8pt;
-  }
+    }
 
   </style>
     <table id="tableMain">
         <tr>
-            <td colspan="3" id="mapCanvas"></td>
+            <td><p id="address"></p></td>
         </tr>
         <tr>
-            <td id="idTD"><p><b>Closest address:<b><p></td>
-            <td colspan="2"><p id="address"></p></td>
+            <td id="mapCanvas"></td>
         </tr>
     </table>
 </body>

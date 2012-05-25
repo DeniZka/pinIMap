@@ -12,32 +12,33 @@
 #include <glib-object.h>
 #include <gtk/gtk.h>
 #include <webkit/webkit.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 #include <glib/gstdio.h>
 #include <float.h>
 #include <math.h>
 #include <gexiv2/gexiv2.h>
 #include <gdk-pixbuf/gdk-pixdata.h>
+#include <gdk/gdk.h>
 
 
-#define TYPE_VUI (vui_get_type ())
-#define VUI(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), TYPE_VUI, Vui))
-#define VUI_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), TYPE_VUI, VuiClass))
-#define IS_VUI(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TYPE_VUI))
-#define IS_VUI_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), TYPE_VUI))
-#define VUI_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), TYPE_VUI, VuiClass))
+#define TYPE_PINIMAP (pinimap_get_type ())
+#define PINIMAP(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), TYPE_PINIMAP, pinimap))
+#define PINIMAP_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), TYPE_PINIMAP, pinimapClass))
+#define IS_PINIMAP(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TYPE_PINIMAP))
+#define IS_PINIMAP_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), TYPE_PINIMAP))
+#define PINIMAP_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), TYPE_PINIMAP, pinimapClass))
 
-typedef struct _Vui Vui;
-typedef struct _VuiClass VuiClass;
-typedef struct _VuiPrivate VuiPrivate;
+typedef struct _pinimap pinimap;
+typedef struct _pinimapClass pinimapClass;
+typedef struct _pinimapPrivate pinimapPrivate;
 #define _g_object_unref0(var) ((var == NULL) ? NULL : (var = (g_object_unref (var), NULL)))
 #define _g_error_free0(var) ((var == NULL) ? NULL : (var = (g_error_free (var), NULL)))
 #define _g_free0(var) (var = (g_free (var), NULL))
+#define _g_regex_unref0(var) ((var == NULL) ? NULL : (var = (g_regex_unref (var), NULL)))
 #define _gtk_tree_path_free0(var) ((var == NULL) ? NULL : (var = (gtk_tree_path_free (var), NULL)))
 #define __g_list_free__gtk_tree_path_free0_0(var) ((var == NULL) ? NULL : (var = (_g_list_free__gtk_tree_path_free0_ (var), NULL)))
-#define _g_regex_unref0(var) ((var == NULL) ? NULL : (var = (g_regex_unref (var), NULL)))
 #define _g_match_info_free0(var) ((var == NULL) ? NULL : (var = (g_match_info_free (var), NULL)))
 #define __g_slist_free__g_free0_0(var) ((var == NULL) ? NULL : (var = (_g_slist_free__g_free0_ (var), NULL)))
 #define _gexiv2_metadata_free0(var) ((var == NULL) ? NULL : (var = (gexiv2_metadata_free (var), NULL)))
@@ -53,21 +54,22 @@ typedef struct _app app;
 typedef struct _appClass appClass;
 typedef struct _appPrivate appPrivate;
 
-struct _Vui {
+struct _pinimap {
 	GObject parent_instance;
-	VuiPrivate * priv;
+	pinimapPrivate * priv;
 	GtkWindow* win;
 };
 
-struct _VuiClass {
+struct _pinimapClass {
 	GObjectClass parent_class;
 };
 
-struct _VuiPrivate {
+struct _pinimapPrivate {
 	WebKitWebView* Wv;
 	GtkTreeView* TVFiles;
 	GtkTreeModel* TModel;
 	GtkListStore* dataStore;
+	GtkEntry* ESearch;
 };
 
 struct _app {
@@ -80,35 +82,41 @@ struct _appClass {
 };
 
 
-static gpointer vui_parent_class = NULL;
+static gpointer pinimap_parent_class = NULL;
 static gpointer app_parent_class = NULL;
 
-GType vui_get_type (void) G_GNUC_CONST;
-#define VUI_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), TYPE_VUI, VuiPrivate))
+GType pinimap_get_type (void) G_GNUC_CONST;
+#define PINIMAP_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), TYPE_PINIMAP, pinimapPrivate))
 enum  {
-	VUI_DUMMY_PROPERTY
+	PINIMAP_DUMMY_PROPERTY
 };
-#define VUI_COL_IMG 0
-#define VUI_COL_FIL 1
-#define VUI_COL_LAT 2
-#define VUI_COL_LNG 3
-#define VUI_COL_PTH 4
-Vui* vui_new (void);
-Vui* vui_construct (GType object_type);
+#define PINIMAP_COL_IMG 0
+#define PINIMAP_COL_FIL 1
+#define PINIMAP_COL_LAT 2
+#define PINIMAP_COL_LNG 3
+#define PINIMAP_COL_PTH 4
+#define PINIMAP_JMSJ_XY "coords"
+#define PINIMAP_JMSJ_NO_LOC "no_results"
+pinimap* pinimap_new (void);
+pinimap* pinimap_construct (GType object_type);
 static void _gtk_main_quit_gtk_object_destroy (GtkObject* _sender, gpointer self);
-static void vui_webkit_connect (Vui* self, GtkBuilder* gbldr);
-void vui_on_selection_changed (Vui* self);
-static void _vui_on_selection_changed_gtk_tree_selection_changed (GtkTreeSelection* _sender, gpointer self);
-gboolean vui_on_java_message (Vui* self, const gchar* message, gint line_number, const gchar* source_id);
-static gboolean _vui_on_java_message_webkit_web_view_console_message (WebKitWebView* _sender, const gchar* message, gint line_number, const gchar* source_id, gpointer self);
+static void pinimap_webkit_connect (pinimap* self, GtkBuilder* gbldr);
+void pinimap_on_selection_changed (pinimap* self);
+static void _pinimap_on_selection_changed_gtk_tree_selection_changed (GtkTreeSelection* _sender, gpointer self);
+gboolean pinimap_on_java_message (pinimap* self, const gchar* message, gint line_number, const gchar* source_id);
+static gboolean _pinimap_on_java_message_webkit_web_view_console_message (WebKitWebView* _sender, const gchar* message, gint line_number, const gchar* source_id, gpointer self);
 static void _gtk_tree_path_free0_ (gpointer var);
 static void _g_list_free__gtk_tree_path_free0_ (GList* self);
-void vui_on_bopen_click (GtkWidget* source, Vui* self);
+void pinimap_on_bopen_click (GtkWidget* source, pinimap* self);
 static void _g_free0_ (gpointer var);
 static void _g_slist_free__g_free0_ (GSList* self);
-void vui_on_BSave_clicked (GtkWidget* source, Vui* self);
-void vui_on_BClear_clicked (GtkWidget* source, Vui* self);
-static void vui_finalize (GObject* obj);
+void pinimap_on_BSave_clicked (GtkWidget* source, pinimap* self);
+void pinimap_on_BClear_clicked (GtkWidget* source, pinimap* self);
+void pinimap_on_BSearch_clicked (GtkWidget* source, pinimap* self);
+void pinimap_on_ESearch_activate (GtkWidget* source, pinimap* self);
+void pinimap_on_ESearch_icon_press (GtkEntryIconPosition p0, GdkEvent* p1, pinimap* self);
+void pinimap_on_BCenter_clicked (GtkWidget* source, pinimap* self);
+static void pinimap_finalize (GObject* obj);
 GType app_get_type (void) G_GNUC_CONST;
 enum  {
 	APP_DUMMY_PROPERTY
@@ -131,17 +139,17 @@ static void _gtk_main_quit_gtk_object_destroy (GtkObject* _sender, gpointer self
 }
 
 
-static void _vui_on_selection_changed_gtk_tree_selection_changed (GtkTreeSelection* _sender, gpointer self) {
-	vui_on_selection_changed (self);
+static void _pinimap_on_selection_changed_gtk_tree_selection_changed (GtkTreeSelection* _sender, gpointer self) {
+	pinimap_on_selection_changed (self);
 }
 
 
-Vui* vui_construct (GType object_type) {
-	Vui * self = NULL;
+pinimap* pinimap_construct (GType object_type) {
+	pinimap * self = NULL;
 	GtkBuilder* _tmp0_;
 	GtkBuilder* gbldr;
 	GError * _inner_error_ = NULL;
-	self = (Vui*) g_object_new (object_type, NULL);
+	self = (pinimap*) g_object_new (object_type, NULL);
 	_tmp0_ = gtk_builder_new ();
 	gbldr = _tmp0_;
 	{
@@ -161,6 +169,8 @@ Vui* vui_construct (GType object_type) {
 		GtkTreeSelection* _tmp13_;
 		GObject* _tmp14_ = NULL;
 		GtkListStore* _tmp15_;
+		GObject* _tmp16_ = NULL;
+		GtkEntry* _tmp17_;
 		gtk_builder_add_from_file (gbldr, "main.glade", &_inner_error_);
 		if (_inner_error_ != NULL) {
 			goto __catch0_g_error;
@@ -172,7 +182,7 @@ Vui* vui_construct (GType object_type) {
 		_tmp3_ = self->win;
 		g_signal_connect ((GtkObject*) _tmp3_, "destroy", (GCallback) _gtk_main_quit_gtk_object_destroy, NULL);
 		gtk_builder_connect_signals (gbldr, self);
-		vui_webkit_connect (self, gbldr);
+		pinimap_webkit_connect (self, gbldr);
 		_tmp4_ = gtk_builder_get_object (gbldr, "TVFiles");
 		_tmp5_ = _g_object_ref0 (GTK_IS_TREE_VIEW (_tmp4_) ? ((GtkTreeView*) _tmp4_) : NULL);
 		_g_object_unref0 (self->priv->TVFiles);
@@ -189,26 +199,30 @@ Vui* vui_construct (GType object_type) {
 		_tmp12_ = ts;
 		gtk_tree_selection_set_mode (_tmp12_, GTK_SELECTION_MULTIPLE);
 		_tmp13_ = ts;
-		g_signal_connect_object (_tmp13_, "changed", (GCallback) _vui_on_selection_changed_gtk_tree_selection_changed, self, 0);
+		g_signal_connect_object (_tmp13_, "changed", (GCallback) _pinimap_on_selection_changed_gtk_tree_selection_changed, self, 0);
 		_tmp14_ = gtk_builder_get_object (gbldr, "dataStore");
 		_tmp15_ = _g_object_ref0 (GTK_IS_LIST_STORE (_tmp14_) ? ((GtkListStore*) _tmp14_) : NULL);
 		_g_object_unref0 (self->priv->dataStore);
 		self->priv->dataStore = _tmp15_;
+		_tmp16_ = gtk_builder_get_object (gbldr, "ESearch");
+		_tmp17_ = _g_object_ref0 (GTK_IS_ENTRY (_tmp16_) ? ((GtkEntry*) _tmp16_) : NULL);
+		_g_object_unref0 (self->priv->ESearch);
+		self->priv->ESearch = _tmp17_;
 		_g_object_unref0 (ts);
 	}
 	goto __finally0;
 	__catch0_g_error:
 	{
 		GError* e = NULL;
-		FILE* _tmp16_;
-		GError* _tmp17_;
-		const gchar* _tmp18_;
+		FILE* _tmp18_;
+		GError* _tmp19_;
+		const gchar* _tmp20_;
 		e = _inner_error_;
 		_inner_error_ = NULL;
-		_tmp16_ = stderr;
-		_tmp17_ = e;
-		_tmp18_ = _tmp17_->message;
-		fprintf (_tmp16_, "Could not load UI: %s\n", _tmp18_);
+		_tmp18_ = stderr;
+		_tmp19_ = e;
+		_tmp20_ = _tmp19_->message;
+		fprintf (_tmp18_, "Could not load UI: %s\n", _tmp20_);
 		_g_error_free0 (e);
 	}
 	__finally0:
@@ -223,19 +237,19 @@ Vui* vui_construct (GType object_type) {
 }
 
 
-Vui* vui_new (void) {
-	return vui_construct (TYPE_VUI);
+pinimap* pinimap_new (void) {
+	return pinimap_construct (TYPE_PINIMAP);
 }
 
 
-static gboolean _vui_on_java_message_webkit_web_view_console_message (WebKitWebView* _sender, const gchar* message, gint line_number, const gchar* source_id, gpointer self) {
+static gboolean _pinimap_on_java_message_webkit_web_view_console_message (WebKitWebView* _sender, const gchar* message, gint line_number, const gchar* source_id, gpointer self) {
 	gboolean result;
-	result = vui_on_java_message (self, message, line_number, source_id);
+	result = pinimap_on_java_message (self, message, line_number, source_id);
 	return result;
 }
 
 
-static void vui_webkit_connect (Vui* self, GtkBuilder* gbldr) {
+static void pinimap_webkit_connect (pinimap* self, GtkBuilder* gbldr) {
 	GtkBuilder* _tmp0_;
 	GObject* _tmp1_ = NULL;
 	GtkScrolledWindow* _tmp2_;
@@ -258,7 +272,7 @@ static void vui_webkit_connect (Vui* self, GtkBuilder* gbldr) {
 	_g_object_unref0 (self->priv->Wv);
 	self->priv->Wv = _tmp4_;
 	_tmp5_ = self->priv->Wv;
-	g_signal_connect_object (_tmp5_, "console-message", (GCallback) _vui_on_java_message_webkit_web_view_console_message, self, 0);
+	g_signal_connect_object (_tmp5_, "console-message", (GCallback) _pinimap_on_java_message_webkit_web_view_console_message, self, 0);
 	_tmp6_ = self->priv->Wv;
 	gtk_container_add ((GtkContainer*) sw, (GtkWidget*) _tmp6_);
 	{
@@ -328,21 +342,21 @@ static void _g_list_free__gtk_tree_path_free0_ (GList* self) {
 }
 
 
-gboolean vui_on_java_message (Vui* self, const gchar* message, gint line_number, const gchar* source_id) {
+gboolean pinimap_on_java_message (pinimap* self, const gchar* message, gint line_number, const gchar* source_id) {
 	gboolean result = FALSE;
 	FILE* _tmp0_;
 	const gchar* _tmp1_;
-	GRegex* _tmp2_;
-	GRegex* rx;
-	const gchar* _tmp3_;
-	gchar** _tmp4_;
-	gchar** _tmp5_ = NULL;
+	gchar* _tmp2_;
+	gchar** _tmp3_ = NULL;
 	gchar** tokens;
 	gint tokens_length1;
 	gint _tokens_size_;
-	gchar** _tmp6_;
-	gint _tmp6__length1;
-	const gchar* _tmp7_;
+	gchar** _tmp11_;
+	gint _tmp11__length1;
+	const gchar* _tmp12_;
+	gchar** _tmp44_;
+	gint _tmp44__length1;
+	const gchar* _tmp45_;
 	GError * _inner_error_ = NULL;
 	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (message != NULL, FALSE);
@@ -350,124 +364,165 @@ gboolean vui_on_java_message (Vui* self, const gchar* message, gint line_number,
 	_tmp0_ = stderr;
 	_tmp1_ = message;
 	fprintf (_tmp0_, "Java Message us: %s\n", _tmp1_);
-	_tmp2_ = g_regex_new ("\\s", 0, 0, &_inner_error_);
-	rx = _tmp2_;
+	_tmp2_ = g_strdup ("tmp");
+	_tmp3_ = g_new0 (gchar*, 1 + 1);
+	_tmp3_[0] = _tmp2_;
+	tokens = _tmp3_;
+	tokens_length1 = 1;
+	_tokens_size_ = tokens_length1;
+	{
+		GRegex* _tmp4_;
+		GRegex* rx;
+		const gchar* _tmp5_;
+		gchar** _tmp6_;
+		gchar** _tmp7_ = NULL;
+		_tmp4_ = g_regex_new ("\\s", 0, 0, &_inner_error_);
+		rx = _tmp4_;
+		if (_inner_error_ != NULL) {
+			if (_inner_error_->domain == G_REGEX_ERROR) {
+				goto __catch2_g_regex_error;
+			}
+			tokens = (_vala_array_free (tokens, tokens_length1, (GDestroyNotify) g_free), NULL);
+			g_critical ("file %s: line %d: unexpected error: %s (%s, %d)", __FILE__, __LINE__, _inner_error_->message, g_quark_to_string (_inner_error_->domain), _inner_error_->code);
+			g_clear_error (&_inner_error_);
+			return FALSE;
+		}
+		_tmp5_ = message;
+		_tmp7_ = _tmp6_ = g_regex_split (rx, _tmp5_, 0);
+		tokens = (_vala_array_free (tokens, tokens_length1, (GDestroyNotify) g_free), NULL);
+		tokens = _tmp7_;
+		tokens_length1 = _vala_array_length (_tmp6_);
+		_tokens_size_ = tokens_length1;
+		_g_regex_unref0 (rx);
+	}
+	goto __finally2;
+	__catch2_g_regex_error:
+	{
+		GError* e = NULL;
+		FILE* _tmp8_;
+		GError* _tmp9_;
+		const gchar* _tmp10_;
+		e = _inner_error_;
+		_inner_error_ = NULL;
+		_tmp8_ = stderr;
+		_tmp9_ = e;
+		_tmp10_ = _tmp9_->message;
+		fprintf (_tmp8_, "Error: %s\n", _tmp10_);
+		_g_error_free0 (e);
+	}
+	__finally2:
 	if (_inner_error_ != NULL) {
+		tokens = (_vala_array_free (tokens, tokens_length1, (GDestroyNotify) g_free), NULL);
 		g_critical ("file %s: line %d: uncaught error: %s (%s, %d)", __FILE__, __LINE__, _inner_error_->message, g_quark_to_string (_inner_error_->domain), _inner_error_->code);
 		g_clear_error (&_inner_error_);
 		return FALSE;
 	}
-	_tmp3_ = message;
-	_tmp5_ = _tmp4_ = g_regex_split (rx, _tmp3_, 0);
-	tokens = _tmp5_;
-	tokens_length1 = _vala_array_length (_tmp4_);
-	_tokens_size_ = tokens_length1;
-	_tmp6_ = tokens;
-	_tmp6__length1 = tokens_length1;
-	_tmp7_ = _tmp6_[0];
-	if (g_strcmp0 (_tmp7_, "coords") == 0) {
-		GtkTreeView* _tmp8_;
-		GtkTreeSelection* _tmp9_ = NULL;
-		GtkTreeSelection* _tmp10_;
+	_tmp11_ = tokens;
+	_tmp11__length1 = tokens_length1;
+	_tmp12_ = _tmp11_[0];
+	if (g_strcmp0 (_tmp12_, PINIMAP_JMSJ_XY) == 0) {
+		GtkTreeView* _tmp13_;
+		GtkTreeSelection* _tmp14_ = NULL;
+		GtkTreeSelection* _tmp15_;
 		GtkTreeSelection* ts;
 		GtkTreeModel* tm = NULL;
 		GtkTreeIter ti = {0};
-		GtkTreeSelection* _tmp11_;
-		GtkTreeModel* _tmp12_ = NULL;
-		GList* _tmp13_ = NULL;
-		GtkTreeModel* _tmp14_;
+		GtkTreeSelection* _tmp16_;
+		GtkTreeModel* _tmp17_ = NULL;
+		GList* _tmp18_ = NULL;
+		GtkTreeModel* _tmp19_;
 		GList* sl;
-		_tmp8_ = self->priv->TVFiles;
-		_tmp9_ = gtk_tree_view_get_selection (_tmp8_);
-		_tmp10_ = _g_object_ref0 (_tmp9_);
-		ts = _tmp10_;
-		_tmp11_ = ts;
-		_tmp13_ = gtk_tree_selection_get_selected_rows (_tmp11_, &_tmp12_);
+		_tmp13_ = self->priv->TVFiles;
+		_tmp14_ = gtk_tree_view_get_selection (_tmp13_);
+		_tmp15_ = _g_object_ref0 (_tmp14_);
+		ts = _tmp15_;
+		_tmp16_ = ts;
+		_tmp18_ = gtk_tree_selection_get_selected_rows (_tmp16_, &_tmp17_);
 		_g_object_unref0 (tm);
-		_tmp14_ = _g_object_ref0 (_tmp12_);
-		tm = _tmp14_;
-		sl = _tmp13_;
+		_tmp19_ = _g_object_ref0 (_tmp17_);
+		tm = _tmp19_;
+		sl = _tmp18_;
 		{
 			gint i;
 			i = 3;
 			{
-				gboolean _tmp15_;
-				_tmp15_ = TRUE;
+				gboolean _tmp20_;
+				_tmp20_ = TRUE;
 				while (TRUE) {
-					gboolean _tmp16_;
-					gint _tmp18_;
-					gchar** _tmp19_;
-					gint _tmp19__length1;
-					GList* _tmp20_;
-					_tmp16_ = _tmp15_;
-					if (!_tmp16_) {
-						gint _tmp17_;
-						_tmp17_ = i;
-						i = _tmp17_ + 1;
+					gboolean _tmp21_;
+					gint _tmp23_;
+					gchar** _tmp24_;
+					gint _tmp24__length1;
+					GList* _tmp25_;
+					_tmp21_ = _tmp20_;
+					if (!_tmp21_) {
+						gint _tmp22_;
+						_tmp22_ = i;
+						i = _tmp22_ + 1;
 					}
-					_tmp15_ = FALSE;
-					_tmp18_ = i;
-					_tmp19_ = tokens;
-					_tmp19__length1 = tokens_length1;
-					if (!(_tmp18_ < _tmp19__length1)) {
+					_tmp20_ = FALSE;
+					_tmp23_ = i;
+					_tmp24_ = tokens;
+					_tmp24__length1 = tokens_length1;
+					if (!(_tmp23_ < _tmp24__length1)) {
 						break;
 					}
-					_tmp20_ = sl;
+					_tmp25_ = sl;
 					{
 						GList* tp_collection = NULL;
 						GList* tp_it = NULL;
-						tp_collection = _tmp20_;
+						tp_collection = _tmp25_;
 						for (tp_it = tp_collection; tp_it != NULL; tp_it = tp_it->next) {
-							GtkTreePath* _tmp21_;
+							GtkTreePath* _tmp26_;
 							GtkTreePath* tp = NULL;
-							_tmp21_ = _gtk_tree_path_copy0 ((GtkTreePath*) tp_it->data);
-							tp = _tmp21_;
+							_tmp26_ = _gtk_tree_path_copy0 ((GtkTreePath*) tp_it->data);
+							tp = _tmp26_;
 							{
-								GtkTreeModel* _tmp22_;
-								GtkTreePath* _tmp23_;
-								GtkTreeIter _tmp24_ = {0};
+								GtkTreeModel* _tmp27_;
+								GtkTreePath* _tmp28_;
+								GtkTreeIter _tmp29_ = {0};
 								gchar* name = NULL;
-								GtkTreeModel* _tmp25_;
-								GtkTreeIter _tmp26_;
-								const gchar* _tmp27_;
-								gchar** _tmp28_;
-								gint _tmp28__length1;
-								gint _tmp29_;
-								const gchar* _tmp30_;
-								_tmp22_ = tm;
-								_tmp23_ = tp;
-								gtk_tree_model_get_iter (_tmp22_, &_tmp24_, _tmp23_);
-								ti = _tmp24_;
-								_tmp25_ = tm;
-								_tmp26_ = ti;
-								gtk_tree_model_get (_tmp25_, &_tmp26_, VUI_COL_FIL, &name, -1);
-								_tmp27_ = name;
-								_tmp28_ = tokens;
-								_tmp28__length1 = tokens_length1;
-								_tmp29_ = i;
-								_tmp30_ = _tmp28_[_tmp29_];
-								if (g_strcmp0 (_tmp27_, _tmp30_) == 0) {
-									GtkListStore* _tmp31_;
-									GtkTreeIter _tmp32_;
-									gchar** _tmp33_;
-									gint _tmp33__length1;
-									const gchar* _tmp34_;
-									gdouble _tmp35_ = 0.0;
-									gchar** _tmp36_;
-									gint _tmp36__length1;
-									const gchar* _tmp37_;
-									gdouble _tmp38_ = 0.0;
-									_tmp31_ = self->priv->dataStore;
-									_tmp32_ = ti;
-									_tmp33_ = tokens;
-									_tmp33__length1 = tokens_length1;
-									_tmp34_ = _tmp33_[1];
-									_tmp35_ = double_parse (_tmp34_);
-									_tmp36_ = tokens;
-									_tmp36__length1 = tokens_length1;
-									_tmp37_ = _tmp36_[2];
-									_tmp38_ = double_parse (_tmp37_);
-									gtk_list_store_set (_tmp31_, &_tmp32_, VUI_COL_LAT, _tmp35_, VUI_COL_LNG, _tmp38_, -1);
+								GtkTreeModel* _tmp30_;
+								GtkTreeIter _tmp31_;
+								const gchar* _tmp32_;
+								gchar** _tmp33_;
+								gint _tmp33__length1;
+								gint _tmp34_;
+								const gchar* _tmp35_;
+								_tmp27_ = tm;
+								_tmp28_ = tp;
+								gtk_tree_model_get_iter (_tmp27_, &_tmp29_, _tmp28_);
+								ti = _tmp29_;
+								_tmp30_ = tm;
+								_tmp31_ = ti;
+								gtk_tree_model_get (_tmp30_, &_tmp31_, PINIMAP_COL_FIL, &name, -1);
+								_tmp32_ = name;
+								_tmp33_ = tokens;
+								_tmp33__length1 = tokens_length1;
+								_tmp34_ = i;
+								_tmp35_ = _tmp33_[_tmp34_];
+								if (g_strcmp0 (_tmp32_, _tmp35_) == 0) {
+									GtkListStore* _tmp36_;
+									GtkTreeIter _tmp37_;
+									gchar** _tmp38_;
+									gint _tmp38__length1;
+									const gchar* _tmp39_;
+									gdouble _tmp40_ = 0.0;
+									gchar** _tmp41_;
+									gint _tmp41__length1;
+									const gchar* _tmp42_;
+									gdouble _tmp43_ = 0.0;
+									_tmp36_ = self->priv->dataStore;
+									_tmp37_ = ti;
+									_tmp38_ = tokens;
+									_tmp38__length1 = tokens_length1;
+									_tmp39_ = _tmp38_[1];
+									_tmp40_ = double_parse (_tmp39_);
+									_tmp41_ = tokens;
+									_tmp41__length1 = tokens_length1;
+									_tmp42_ = _tmp41_[2];
+									_tmp43_ = double_parse (_tmp42_);
+									gtk_list_store_set (_tmp36_, &_tmp37_, PINIMAP_COL_LAT, _tmp40_, PINIMAP_COL_LNG, _tmp43_, -1);
 									_g_free0 (name);
 									_gtk_tree_path_free0 (tp);
 									break;
@@ -484,9 +539,16 @@ gboolean vui_on_java_message (Vui* self, const gchar* message, gint line_number,
 		_g_object_unref0 (tm);
 		_g_object_unref0 (ts);
 	}
+	_tmp44_ = tokens;
+	_tmp44__length1 = tokens_length1;
+	_tmp45_ = _tmp44_[0];
+	if (g_strcmp0 (_tmp45_, PINIMAP_JMSJ_NO_LOC) == 0) {
+		GtkEntry* _tmp46_;
+		_tmp46_ = self->priv->ESearch;
+		gtk_editable_select_region ((GtkEditable*) _tmp46_, 0, -1);
+	}
 	result = TRUE;
 	tokens = (_vala_array_free (tokens, tokens_length1, (GDestroyNotify) g_free), NULL);
-	_g_regex_unref0 (rx);
 	return result;
 }
 
@@ -511,7 +573,7 @@ static gchar* double_to_string (gdouble self) {
 }
 
 
-void vui_on_selection_changed (Vui* self) {
+void pinimap_on_selection_changed (pinimap* self) {
 	GtkTreeView* _tmp0_;
 	GtkTreeSelection* _tmp1_ = NULL;
 	GtkTreeSelection* _tmp2_;
@@ -579,7 +641,7 @@ void vui_on_selection_changed (Vui* self) {
 				ti = _tmp12_;
 				_tmp13_ = tm;
 				_tmp14_ = ti;
-				gtk_tree_model_get (_tmp13_, &_tmp14_, VUI_COL_FIL, &name, VUI_COL_LAT, &lat, VUI_COL_LNG, &lng, -1);
+				gtk_tree_model_get (_tmp13_, &_tmp14_, PINIMAP_COL_FIL, &name, PINIMAP_COL_LAT, &lat, PINIMAP_COL_LNG, &lng, -1);
 				_tmp15_ = name;
 				_tmp16_ = lat;
 				_tmp17_ = double_to_string (_tmp16_);
@@ -624,7 +686,7 @@ static void _g_slist_free__g_free0_ (GSList* self) {
 }
 
 
-void vui_on_bopen_click (GtkWidget* source, Vui* self) {
+void pinimap_on_bopen_click (GtkWidget* source, pinimap* self) {
 	GtkWindow* _tmp0_;
 	GtkFileChooserDialog* _tmp1_;
 	GtkFileChooserDialog* _tmp2_;
@@ -644,7 +706,7 @@ void vui_on_bopen_click (GtkWidget* source, Vui* self) {
 	GExiv2Metadata* exiv2;
 	GtkFileChooserDialog* _tmp12_;
 	gint _tmp13_ = 0;
-	GtkFileChooserDialog* _tmp72_;
+	GtkFileChooserDialog* _tmp78_;
 	GError * _inner_error_ = NULL;
 	g_return_if_fail (self != NULL);
 	g_return_if_fail (source != NULL);
@@ -684,15 +746,19 @@ void vui_on_bopen_click (GtkWidget* source, Vui* self) {
 		GtkTreeIter iter = {0};
 		gchar* path = NULL;
 		gchar* name = NULL;
-		gdouble alt = 0.0;
-		gdouble lat = 0.0;
-		gdouble lng = 0.0;
-		GExiv2Orientation exor = 0;
+		gdouble alt;
+		gdouble lat;
+		gdouble lng;
+		GExiv2Orientation exor;
 		GdkInterpType it;
 		GdkPixbufRotation pbrt;
 		_tmp14_ = odlg;
 		_tmp15_ = gtk_file_chooser_get_filenames ((GtkFileChooser*) _tmp14_);
 		files_name = _tmp15_;
+		alt = (gdouble) 0;
+		lat = (gdouble) 0;
+		lng = (gdouble) 0;
+		exor = GEXIV2_ORIENTATION_NORMAL;
 		it = GDK_INTERP_NEAREST;
 		pbrt = GDK_PIXBUF_ROTATE_NONE;
 		{
@@ -721,35 +787,9 @@ void vui_on_bopen_click (GtkWidget* source, Vui* self) {
 					GMatchInfo* _tmp41_ = NULL;
 					GMatchInfo* _tmp42_;
 					gchar* _tmp43_ = NULL;
-					GExiv2Metadata* _tmp44_;
-					const gchar* _tmp45_;
-					GExiv2Metadata* _tmp46_;
-					gdouble _tmp47_ = 0.0;
-					gdouble _tmp48_ = 0.0;
-					gdouble _tmp49_ = 0.0;
-					GExiv2Metadata* _tmp50_;
-					GExiv2Orientation _tmp51_ = 0;
-					GtkListStore* _tmp52_;
-					GtkTreeIter _tmp53_ = {0};
-					GExiv2Orientation _tmp54_;
-					const gchar* _tmp55_;
-					GdkPixbuf* _tmp56_;
-					GdkPixbuf* _tmp57_;
-					GdkPixbuf* _tmp58_;
-					GdkInterpType _tmp59_;
-					GdkPixbuf* _tmp60_ = NULL;
-					GdkPixbuf* _tmp61_;
-					GdkPixbufRotation _tmp62_;
-					GdkPixbuf* _tmp63_ = NULL;
-					GdkPixbuf* _tmp64_;
-					GdkPixbuf* pb;
-					GtkListStore* _tmp65_;
-					GtkTreeIter _tmp66_;
-					GdkPixbuf* _tmp67_;
-					const gchar* _tmp68_;
-					gdouble _tmp69_;
-					gdouble _tmp70_;
-					const gchar* _tmp71_;
+					GtkListStore* _tmp55_;
+					GtkTreeIter _tmp56_ = {0};
+					GExiv2Orientation _tmp57_;
 					_tmp17_ = _tmp16_;
 					if (!_tmp17_) {
 						gint _tmp18_;
@@ -796,7 +836,7 @@ void vui_on_bopen_click (GtkWidget* source, Vui* self) {
 								_tmp29_ = FALSE;
 								_tmp33_ = self->priv->TModel;
 								_tmp34_ = iter;
-								gtk_tree_model_get (_tmp33_, &_tmp34_, VUI_COL_PTH, &tm_path, -1);
+								gtk_tree_model_get (_tmp33_, &_tmp34_, PINIMAP_COL_PTH, &tm_path, -1);
 								_tmp35_ = path;
 								_tmp36_ = tm_path;
 								if (g_strcmp0 (_tmp35_, _tmp36_) == 0) {
@@ -823,9 +863,46 @@ void vui_on_bopen_click (GtkWidget* source, Vui* self) {
 					_tmp43_ = g_match_info_fetch (_tmp42_, 0);
 					_g_free0 (name);
 					name = _tmp43_;
-					_tmp44_ = exiv2;
-					_tmp45_ = path;
-					gexiv2_metadata_open_path (_tmp44_, _tmp45_, &_inner_error_);
+					{
+						GExiv2Metadata* _tmp44_;
+						const gchar* _tmp45_;
+						GExiv2Metadata* _tmp46_;
+						gdouble _tmp47_ = 0.0;
+						gdouble _tmp48_ = 0.0;
+						gdouble _tmp49_ = 0.0;
+						GExiv2Metadata* _tmp50_;
+						GExiv2Orientation _tmp51_ = 0;
+						_tmp44_ = exiv2;
+						_tmp45_ = path;
+						gexiv2_metadata_open_path (_tmp44_, _tmp45_, &_inner_error_);
+						if (_inner_error_ != NULL) {
+							goto __catch3_g_error;
+						}
+						_tmp46_ = exiv2;
+						gexiv2_metadata_get_gps_info (_tmp46_, &_tmp47_, &_tmp48_, &_tmp49_);
+						lng = _tmp47_;
+						lat = _tmp48_;
+						alt = _tmp49_;
+						_tmp50_ = exiv2;
+						_tmp51_ = gexiv2_metadata_get_orientation (_tmp50_);
+						exor = _tmp51_;
+					}
+					goto __finally3;
+					__catch3_g_error:
+					{
+						GError* e = NULL;
+						FILE* _tmp52_;
+						GError* _tmp53_;
+						const gchar* _tmp54_;
+						e = _inner_error_;
+						_inner_error_ = NULL;
+						_tmp52_ = stderr;
+						_tmp53_ = e;
+						_tmp54_ = _tmp53_->message;
+						fprintf (_tmp52_, "Error: %s\n", _tmp54_);
+						_g_error_free0 (e);
+					}
+					__finally3:
 					if (_inner_error_ != NULL) {
 						_g_free0 (tm_path);
 						_g_free0 (name);
@@ -840,19 +917,11 @@ void vui_on_bopen_click (GtkWidget* source, Vui* self) {
 						g_clear_error (&_inner_error_);
 						return;
 					}
-					_tmp46_ = exiv2;
-					gexiv2_metadata_get_gps_info (_tmp46_, &_tmp47_, &_tmp48_, &_tmp49_);
-					lng = _tmp47_;
-					lat = _tmp48_;
-					alt = _tmp49_;
-					_tmp50_ = exiv2;
-					_tmp51_ = gexiv2_metadata_get_orientation (_tmp50_);
-					exor = _tmp51_;
-					_tmp52_ = self->priv->dataStore;
-					gtk_list_store_append (_tmp52_, &_tmp53_);
-					iter = _tmp53_;
-					_tmp54_ = exor;
-					switch (_tmp54_) {
+					_tmp55_ = self->priv->dataStore;
+					gtk_list_store_append (_tmp55_, &_tmp56_);
+					iter = _tmp56_;
+					_tmp57_ = exor;
+					switch (_tmp57_) {
 						case GEXIV2_ORIENTATION_ROT_90:
 						{
 							pbrt = GDK_PIXBUF_ROTATE_CLOCKWISE;
@@ -871,9 +940,67 @@ void vui_on_bopen_click (GtkWidget* source, Vui* self) {
 						default:
 						break;
 					}
-					_tmp55_ = path;
-					_tmp56_ = gdk_pixbuf_new_from_file (_tmp55_, &_inner_error_);
-					_tmp57_ = _tmp56_;
+					{
+						const gchar* _tmp58_;
+						GdkPixbuf* _tmp59_;
+						GdkPixbuf* _tmp60_;
+						GdkPixbuf* _tmp61_;
+						GdkInterpType _tmp62_;
+						GdkPixbuf* _tmp63_ = NULL;
+						GdkPixbuf* _tmp64_;
+						GdkPixbufRotation _tmp65_;
+						GdkPixbuf* _tmp66_ = NULL;
+						GdkPixbuf* _tmp67_;
+						GdkPixbuf* pb;
+						GtkListStore* _tmp68_;
+						GtkTreeIter _tmp69_;
+						GdkPixbuf* _tmp70_;
+						const gchar* _tmp71_;
+						gdouble _tmp72_;
+						gdouble _tmp73_;
+						const gchar* _tmp74_;
+						_tmp58_ = path;
+						_tmp59_ = gdk_pixbuf_new_from_file (_tmp58_, &_inner_error_);
+						_tmp60_ = _tmp59_;
+						if (_inner_error_ != NULL) {
+							goto __catch4_g_error;
+						}
+						_tmp61_ = _tmp60_;
+						_tmp62_ = it;
+						_tmp63_ = gdk_pixbuf_scale_simple (_tmp61_, 40, 40, _tmp62_);
+						_tmp64_ = _tmp63_;
+						_tmp65_ = pbrt;
+						_tmp66_ = gdk_pixbuf_rotate_simple (_tmp64_, _tmp65_);
+						_tmp67_ = _tmp66_;
+						_g_object_unref0 (_tmp64_);
+						_g_object_unref0 (_tmp61_);
+						pb = _tmp67_;
+						_tmp68_ = self->priv->dataStore;
+						_tmp69_ = iter;
+						_tmp70_ = pb;
+						_tmp71_ = name;
+						_tmp72_ = lat;
+						_tmp73_ = lng;
+						_tmp74_ = path;
+						gtk_list_store_set (_tmp68_, &_tmp69_, PINIMAP_COL_IMG, _tmp70_, PINIMAP_COL_FIL, _tmp71_, PINIMAP_COL_LAT, _tmp72_, PINIMAP_COL_LNG, _tmp73_, PINIMAP_COL_PTH, _tmp74_, -1);
+						_g_object_unref0 (pb);
+					}
+					goto __finally4;
+					__catch4_g_error:
+					{
+						GError* e = NULL;
+						FILE* _tmp75_;
+						GError* _tmp76_;
+						const gchar* _tmp77_;
+						e = _inner_error_;
+						_inner_error_ = NULL;
+						_tmp75_ = stderr;
+						_tmp76_ = e;
+						_tmp77_ = _tmp76_->message;
+						fprintf (_tmp75_, "Error: %s\n", _tmp77_);
+						_g_error_free0 (e);
+					}
+					__finally4:
 					if (_inner_error_ != NULL) {
 						_g_free0 (tm_path);
 						_g_free0 (name);
@@ -888,25 +1015,6 @@ void vui_on_bopen_click (GtkWidget* source, Vui* self) {
 						g_clear_error (&_inner_error_);
 						return;
 					}
-					_tmp58_ = _tmp57_;
-					_tmp59_ = it;
-					_tmp60_ = gdk_pixbuf_scale_simple (_tmp58_, 40, 40, _tmp59_);
-					_tmp61_ = _tmp60_;
-					_tmp62_ = pbrt;
-					_tmp63_ = gdk_pixbuf_rotate_simple (_tmp61_, _tmp62_);
-					_tmp64_ = _tmp63_;
-					_g_object_unref0 (_tmp61_);
-					_g_object_unref0 (_tmp58_);
-					pb = _tmp64_;
-					_tmp65_ = self->priv->dataStore;
-					_tmp66_ = iter;
-					_tmp67_ = pb;
-					_tmp68_ = name;
-					_tmp69_ = lat;
-					_tmp70_ = lng;
-					_tmp71_ = path;
-					gtk_list_store_set (_tmp65_, &_tmp66_, VUI_COL_IMG, _tmp67_, VUI_COL_FIL, _tmp68_, VUI_COL_LAT, _tmp69_, VUI_COL_LNG, _tmp70_, VUI_COL_PTH, _tmp71_, -1);
-					_g_object_unref0 (pb);
 					_g_free0 (tm_path);
 				}
 			}
@@ -915,8 +1023,8 @@ void vui_on_bopen_click (GtkWidget* source, Vui* self) {
 		_g_free0 (path);
 		__g_slist_free__g_free0_0 (files_name);
 	}
-	_tmp72_ = odlg;
-	gtk_object_destroy ((GtkObject*) _tmp72_);
+	_tmp78_ = odlg;
+	gtk_object_destroy ((GtkObject*) _tmp78_);
 	_gexiv2_metadata_free0 (exiv2);
 	_g_match_info_free0 (match);
 	_g_regex_unref0 (reg);
@@ -925,7 +1033,7 @@ void vui_on_bopen_click (GtkWidget* source, Vui* self) {
 }
 
 
-void vui_on_BSave_clicked (GtkWidget* source, Vui* self) {
+void pinimap_on_BSave_clicked (GtkWidget* source, pinimap* self) {
 	FILE* _tmp0_;
 	g_return_if_fail (self != NULL);
 	g_return_if_fail (source != NULL);
@@ -934,7 +1042,7 @@ void vui_on_BSave_clicked (GtkWidget* source, Vui* self) {
 }
 
 
-void vui_on_BClear_clicked (GtkWidget* source, Vui* self) {
+void pinimap_on_BClear_clicked (GtkWidget* source, pinimap* self) {
 	GtkListStore* _tmp0_;
 	g_return_if_fail (self != NULL);
 	g_return_if_fail (source != NULL);
@@ -943,49 +1051,108 @@ void vui_on_BClear_clicked (GtkWidget* source, Vui* self) {
 }
 
 
-static void vui_class_init (VuiClass * klass) {
-	vui_parent_class = g_type_class_peek_parent (klass);
-	g_type_class_add_private (klass, sizeof (VuiPrivate));
-	G_OBJECT_CLASS (klass)->finalize = vui_finalize;
+void pinimap_on_BSearch_clicked (GtkWidget* source, pinimap* self) {
+	GtkEntry* _tmp0_;
+	const gchar* _tmp1_ = NULL;
+	gchar* _tmp2_;
+	gchar* addr;
+	const gchar* _tmp3_;
+	WebKitWebView* _tmp4_;
+	const gchar* _tmp5_;
+	gchar* _tmp6_ = NULL;
+	gchar* _tmp7_;
+	g_return_if_fail (self != NULL);
+	g_return_if_fail (source != NULL);
+	_tmp0_ = self->priv->ESearch;
+	_tmp1_ = gtk_entry_get_text (_tmp0_);
+	_tmp2_ = g_strdup (_tmp1_);
+	addr = _tmp2_;
+	_tmp3_ = addr;
+	if (g_strcmp0 (_tmp3_, "") == 0) {
+		_g_free0 (addr);
+		return;
+	}
+	_tmp4_ = self->priv->Wv;
+	_tmp5_ = addr;
+	_tmp6_ = g_strdup_printf ("request = '%s'; pan_to_address()", _tmp5_);
+	_tmp7_ = _tmp6_;
+	webkit_web_view_execute_script (_tmp4_, _tmp7_);
+	_g_free0 (_tmp7_);
+	_g_free0 (addr);
 }
 
 
-static void vui_instance_init (Vui * self) {
-	self->priv = VUI_GET_PRIVATE (self);
+void pinimap_on_ESearch_activate (GtkWidget* source, pinimap* self) {
+	GtkEntry* _tmp0_;
+	g_return_if_fail (self != NULL);
+	g_return_if_fail (source != NULL);
+	_tmp0_ = self->priv->ESearch;
+	pinimap_on_BSearch_clicked ((GtkWidget*) _tmp0_, self);
 }
 
 
-static void vui_finalize (GObject* obj) {
-	Vui * self;
-	self = VUI (obj);
+void pinimap_on_ESearch_icon_press (GtkEntryIconPosition p0, GdkEvent* p1, pinimap* self) {
+	GtkEntry* _tmp0_;
+	g_return_if_fail (self != NULL);
+	g_return_if_fail (p1 != NULL);
+	_tmp0_ = self->priv->ESearch;
+	pinimap_on_BSearch_clicked ((GtkWidget*) _tmp0_, self);
+}
+
+
+void pinimap_on_BCenter_clicked (GtkWidget* source, pinimap* self) {
+	WebKitWebView* _tmp0_;
+	g_return_if_fail (self != NULL);
+	g_return_if_fail (source != NULL);
+	_tmp0_ = self->priv->Wv;
+	webkit_web_view_execute_script (_tmp0_, "center_markers()");
+}
+
+
+static void pinimap_class_init (pinimapClass * klass) {
+	pinimap_parent_class = g_type_class_peek_parent (klass);
+	g_type_class_add_private (klass, sizeof (pinimapPrivate));
+	G_OBJECT_CLASS (klass)->finalize = pinimap_finalize;
+}
+
+
+static void pinimap_instance_init (pinimap * self) {
+	self->priv = PINIMAP_GET_PRIVATE (self);
+}
+
+
+static void pinimap_finalize (GObject* obj) {
+	pinimap * self;
+	self = PINIMAP (obj);
 	_g_object_unref0 (self->win);
 	_g_object_unref0 (self->priv->Wv);
 	_g_object_unref0 (self->priv->TVFiles);
 	_g_object_unref0 (self->priv->TModel);
 	_g_object_unref0 (self->priv->dataStore);
-	G_OBJECT_CLASS (vui_parent_class)->finalize (obj);
+	_g_object_unref0 (self->priv->ESearch);
+	G_OBJECT_CLASS (pinimap_parent_class)->finalize (obj);
 }
 
 
-GType vui_get_type (void) {
-	static volatile gsize vui_type_id__volatile = 0;
-	if (g_once_init_enter (&vui_type_id__volatile)) {
-		static const GTypeInfo g_define_type_info = { sizeof (VuiClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) vui_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (Vui), 0, (GInstanceInitFunc) vui_instance_init, NULL };
-		GType vui_type_id;
-		vui_type_id = g_type_register_static (G_TYPE_OBJECT, "Vui", &g_define_type_info, 0);
-		g_once_init_leave (&vui_type_id__volatile, vui_type_id);
+GType pinimap_get_type (void) {
+	static volatile gsize pinimap_type_id__volatile = 0;
+	if (g_once_init_enter (&pinimap_type_id__volatile)) {
+		static const GTypeInfo g_define_type_info = { sizeof (pinimapClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) pinimap_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (pinimap), 0, (GInstanceInitFunc) pinimap_instance_init, NULL };
+		GType pinimap_type_id;
+		pinimap_type_id = g_type_register_static (G_TYPE_OBJECT, "pinimap", &g_define_type_info, 0);
+		g_once_init_leave (&pinimap_type_id__volatile, pinimap_type_id);
 	}
-	return vui_type_id__volatile;
+	return pinimap_type_id__volatile;
 }
 
 
 gint app_main (gchar** args, int args_length1) {
 	gint result = 0;
-	Vui* _tmp0_;
-	Vui* h;
+	pinimap* _tmp0_;
+	pinimap* h;
 	GtkWindow* _tmp1_;
 	gtk_init (&args_length1, &args);
-	_tmp0_ = vui_new ();
+	_tmp0_ = pinimap_new ();
 	h = _tmp0_;
 	_tmp1_ = h->win;
 	gtk_widget_show_all ((GtkWidget*) _tmp1_);
