@@ -22,6 +22,7 @@ public class pinimap : GLib.Object {
     private const int COL_PTH = 4;
     private const string JMSJ_XY = "coords";
     private const string JMSJ_NO_LOC = "no_results";
+    private const int IMG_SIDE_PIX = 50;
     HBox hb;
     
     public pinimap() {
@@ -68,7 +69,7 @@ public class pinimap : GLib.Object {
         //Parce messages
         string[] tokens = {"tmp"};
         try {
-            var rx = new Regex("\\s");
+            var rx = new Regex("\t");
             tokens = rx.split(message);
         } catch (RegexError e) {
             stderr.printf("Error: %s\n", e.message);
@@ -118,7 +119,6 @@ public class pinimap : GLib.Object {
 
             string outs = "file_list = '%s'; add_marker(%s, %s)".printf(name, 
               lat.to_string(), lng.to_string());
-            stderr.printf(outs + "\n");
             Wv.execute_script(outs);
         }
     }
@@ -135,22 +135,23 @@ public class pinimap : GLib.Object {
         odlg.add_filter(fltr);
         odlg.set_select_multiple(true);
         
-        
-        Regex reg = new Regex("[\\w_.-]*?(?=[\\?\\#])|[\\w_.-]*$");
+        Regex reg = new Regex("[^/]*$");
         MatchInfo match;
         var exiv2 = new GExiv2.Metadata();
         if (odlg.run() == ResponseType.ACCEPT) {
             //Let Read selected files
             SList<string> files_name = odlg.get_filenames();
-
             TreeIter iter;
             string path;
             string name;
             double alt = 0;
             double lat = 0;
             double lng = 0;
+            int width = 0;
+            int height = 0;
+            double k;
             GExiv2.Orientation exor = GExiv2.Orientation.NORMAL;
-            Gdk.InterpType it = Gdk.InterpType.NEAREST;
+            Gdk.InterpType it = Gdk.InterpType.BILINEAR;
             Gdk.PixbufRotation pbrt = Gdk.PixbufRotation.NONE;
             for (int i = 0; i < files_name.length(); i++) {
                 path = files_name.nth_data(i);
@@ -177,9 +178,11 @@ public class pinimap : GLib.Object {
                 name = match.fetch(0);
                 
                 try {
-                exiv2.open_path(path);
-                exiv2.get_gps_info(out lng, out lat, out alt);                   
-                exor = exiv2.get_orientation();
+                    exiv2.open_path(path);
+                    exiv2.get_gps_info(out lng, out lat, out alt);                   
+                    exor = exiv2.get_orientation();
+                    height = exiv2.get_pixel_height();
+                    width = exiv2.get_pixel_width();
                 } catch (Error e) {
                     stderr.printf("Error: %s\n", e.message);
                 }
@@ -198,8 +201,16 @@ public class pinimap : GLib.Object {
                 }
 
                 try {
+                    k = (double) width / height;
+                    if (k > 1) {
+                        width = IMG_SIDE_PIX;
+                        height = (int) Math.round(width / k);
+                    } else {
+                        height = IMG_SIDE_PIX;
+                        width = (int) Math.round(height * k);
+                    }
                     Gdk.Pixbuf pb = new Gdk.Pixbuf.from_file(path).
-                      scale_simple(40,40, it).
+                      scale_simple(width, height, it).
                       rotate_simple(pbrt);
                     dataStore.set(iter, COL_IMG, pb,
                       COL_FIL, name, 
@@ -249,12 +260,8 @@ public class pinimap : GLib.Object {
         string addr = ESearch.get_text();
         if (addr == "" ) return;
         Wv.execute_script("request = '%s'; pan_to_address()".printf(addr));
-        //TODO Set focus to ESearch
-//        Widget w;
-//        w.send_focus_change();
-        
-//        hb.child_focus();
-//        ESearch.grab_focus
+        ESearch.child_focus(DirectionType.DOWN);
+        ESearch.select_region(-1, -1);
     }
     
     [CCode (instance_pos = -1)]

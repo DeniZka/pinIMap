@@ -73,11 +73,11 @@ function center_markers() {
         for (i in markersArray) {
             if (i == 0) { continue; }
             title = markersArray[0].getTitle();
-            markersArray[0].setTitle(title + ' ' + markersArray[i].getTitle());
+            markersArray[0].setTitle(title + '\t' + markersArray[i].getTitle());
             markersArray[i].setMap(null);
         }
         markersArray[0].setPosition(center);
-        console.log('coords ' + center.lat() + ' ' + center.lng() + ' ' + markersArray[0].getTitle());
+        console.log('coords\t' + center.lat() + '\t' + center.lng() + '\t' + markersArray[0].getTitle());
     }     
 }
 
@@ -109,7 +109,7 @@ function add_marker(lat, lng) {
             var tll = new google.maps.LatLng(lat, lng);
             if ((mll.lat() == tll.lat()) && (mll.lng() == tll.lng())) {
                 title = markersArray[i].getTitle();
-                markersArray[i].setTitle(title + ' ' + file_list);
+                markersArray[i].setTitle(title + '\t' + file_list);
                 return;
             }
         }
@@ -137,7 +137,7 @@ function add_marker(lat, lng) {
     google.maps.event.addListener(mk, 'dragend', function() {
         var latLng = mk.getPosition();
         geocodePosition(latLng);
-        console.log('coords ' + latLng.lat() + ' ' + latLng.lng() + ' ' + mk.getTitle());
+        console.log('coords\t' + latLng.lat() + '\t' + latLng.lng() + '\t' + mk.getTitle());
     });
 
     //position on selected bounds
